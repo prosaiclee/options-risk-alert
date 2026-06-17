@@ -63,6 +63,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes (market likely closed). Skipping commit."
           else
-            git commit -m "chore: refresh options dashboard [skip ci]"
+            git commit -m "chore: refresh options dashboard"
             git push
           fi
