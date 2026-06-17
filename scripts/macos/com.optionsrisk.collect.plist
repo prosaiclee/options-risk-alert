@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Collect + dashboard + Telegram alert + push, every 15 minutes.
+  Replace /Users/REPLACE_ME/options-risk-alert with your actual repo path.
+  Install:  cp this file to ~/Library/LaunchAgents/ then `launchctl load` it.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.optionsrisk.collect</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/REPLACE_ME/options-risk-alert/scripts/collect_and_push.sh</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/REPLACE_ME/options-risk-alert</string>
+
+  <key>StartInterval</key>
+  <integer>900</integer>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/REPLACE_ME/options-risk-alert/data/collect.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/REPLACE_ME/options-risk-alert/data/collect.err.log</string>
+</dict>
+</plist>

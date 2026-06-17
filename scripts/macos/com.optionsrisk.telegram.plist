@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Poll Telegram for new questions every 60 seconds (near-realtime Q&A).
+  Replace /Users/REPLACE_ME/options-risk-alert with your actual repo path.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.optionsrisk.telegram</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/REPLACE_ME/options-risk-alert/scripts/telegram_poll.sh</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/REPLACE_ME/options-risk-alert</string>
+
+  <key>StartInterval</key>
+  <integer>60</integer>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/REPLACE_ME/options-risk-alert/data/telegram.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/REPLACE_ME/options-risk-alert/data/telegram.err.log</string>
+</dict>
+</plist>

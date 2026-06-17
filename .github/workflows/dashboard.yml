@@ -8,10 +8,11 @@ name: Refresh options dashboard
 # outside U.S. regular market hours, so over-scheduling here is safe and cheap.
 
 on:
-  schedule:
-    # Every 30 min during U.S. regular session, Mon-Fri.
-    # 13:30-20:00 UTC covers 09:30-16:00 ET (EDT) and 08:30-15:00 ET (EST).
-    - cron: "0,30 13-20 * * 1-5"
+  # The Mac mini home server is the primary collector (scripts/collect_and_push.sh),
+  # so the scheduled cron is disabled to avoid two collectors racing on git push.
+  # Re-enable the cron block below if the Mac mini is retired.
+  # schedule:
+  #   - cron: "0,30 13-20 * * 1-5"
   workflow_dispatch: {}
 
 # Never run two refreshes at once (they both push to the same branch).
