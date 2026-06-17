@@ -1,0 +1,68 @@
+name: Refresh options dashboard
+
+# Collects a Yahoo options snapshot, appends it to the baseline CSV, regenerates
+# the static dashboard, and commits the result. Vercel auto-deploys on push.
+#
+# Data collection runs OUTSIDE Vercel on purpose: Yahoo blocks datacenter IPs and
+# yfinance is too heavy for Vercel serverless. The collector itself skips runs
+# outside U.S. regular market hours, so over-scheduling here is safe and cheap.
+
+on:
+  schedule:
+    # Every 30 min during U.S. regular session, Mon-Fri.
+    # 13:30-20:00 UTC covers 09:30-16:00 ET (EDT) and 08:30-15:00 ET (EST).
+    - cron: "0,30 13-20 * * 1-5"
+  workflow_dispatch: {}
+
+# Never run two refreshes at once (they both push to the same branch).
+concurrency:
+  group: dashboard-refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip -r requirements.txt
+
+      - name: Seed baseline CSV if missing
+        run: |
+          if [ ! -f data/yahoo_snapshots.csv ]; then
+            mkdir -p data
+            cp examples/history.csv data/yahoo_snapshots.csv
+          fi
+
+      - name: Collect snapshot and regenerate dashboard
+        run: |
+          python -m options_risk_alert \
+            --provider yahoo \
+            --history data/yahoo_snapshots.csv \
+            --symbols SPY QQQ SOXX SMH \
+            --save-current data/yahoo_snapshots.csv \
+            --append-current \
+            --save-put-details data/yahoo_put_details.csv \
+            --html-report public/index.html
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/index.html data/yahoo_snapshots.csv data/yahoo_put_details.csv
+          if git diff --cached --quiet; then
+            echo "No changes (market likely closed). Skipping commit."
+          else
+            git commit -m "chore: refresh options dashboard [skip ci]"
+            git push
+          fi

@@ -1,0 +1,18 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+
+# Data: ignore everything in data/ EXCEPT the persisted baseline snapshots.
+# (data/* + negation is required; "data/" alone would block re-including files.)
+data/*
+!data/yahoo_snapshots.csv
+!data/yahoo_put_details.csv
+
+# Node / Vercel local
+node_modules/
+.vercel/

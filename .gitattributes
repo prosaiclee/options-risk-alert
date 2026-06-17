@@ -1,0 +1,7 @@
+# Keep LF for files consumed by Linux CI / Vercel to avoid CRLF breakage.
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.js    text eol=lf
+*.json  text eol=lf
+*.py    text eol=lf
+*.sh    text eol=lf

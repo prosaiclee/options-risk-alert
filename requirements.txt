@@ -1,0 +1,2 @@
+yfinance>=0.2.0
+fear-and-greed>=0.4

@@ -1,0 +1,11 @@
+# Vercel only serves the static dashboard + auth middleware.
+# Keep the Python collector, tests, and raw data out of the deployment.
+options_risk_alert/
+tests/
+examples/
+data/
+requirements.txt
+*.pyc
+__pycache__/
+.env
+.env.example
