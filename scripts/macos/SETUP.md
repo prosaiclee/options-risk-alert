@@ -62,7 +62,7 @@ ssh -T git@github.com    # "successfully authenticated" 나오면 OK
 ## 6. 스크립트 실행 권한 + 1회 수동 테스트
 
 ```bash
-chmod +x scripts/collect_and_push.sh scripts/telegram_poll.sh
+chmod +x scripts/collect_and_push.sh scripts/telegram_poll.sh scripts/report.sh
 ./scripts/collect_and_push.sh     # 장중이면 수집·push, 장외면 "Nothing to push"
 ```
 
@@ -72,15 +72,19 @@ plist 안의 `/Users/REPLACE_ME/...` 경로를 본인 경로로 바꿔 복사합
 
 ```bash
 mkdir -p ~/Library/LaunchAgents
-sed "s#/Users/REPLACE_ME#$HOME#g" scripts/macos/com.optionsrisk.collect.plist  > ~/Library/LaunchAgents/com.optionsrisk.collect.plist
-sed "s#/Users/REPLACE_ME#$HOME#g" scripts/macos/com.optionsrisk.telegram.plist > ~/Library/LaunchAgents/com.optionsrisk.telegram.plist
-
-launchctl load ~/Library/LaunchAgents/com.optionsrisk.collect.plist
-launchctl load ~/Library/LaunchAgents/com.optionsrisk.telegram.plist
+for p in collect telegram koreareport usreport; do
+  sed "s#/Users/REPLACE_ME#$HOME#g" "scripts/macos/com.optionsrisk.$p.plist" > "$HOME/Library/LaunchAgents/com.optionsrisk.$p.plist"
+  launchctl load "$HOME/Library/LaunchAgents/com.optionsrisk.$p.plist"
+done
 ```
 
-- `com.optionsrisk.collect` : 15분마다 수집 + 대시보드 + 알림 + push (장외는 자동 skip)
-- `com.optionsrisk.telegram`: 60초마다 텔레그램 질문 폴링·응답
+- `com.optionsrisk.collect`     : 15분마다 수집 + 대시보드 + 알림 + push (장외는 자동 skip)
+- `com.optionsrisk.telegram`    : 60초마다 텔레그램 질문 폴링·응답
+- `com.optionsrisk.koreareport` : 평일 08:30(현지시각) 정기 리포트 (정상 포함)
+- `com.optionsrisk.usreport`    : 평일 22:15(현지시각) 정기 리포트 (정상 포함)
+
+> 정기 리포트 시각은 Mac mini의 **현지 시간대 기준**입니다. Mac mini가 KST(한국)면
+> 그대로 08:30·22:15이 됩니다. 다른 시간대면 plist의 Hour/Minute를 조정하세요.
 
 ## 8. 동작 확인
 
