@@ -175,13 +175,13 @@ python -m options_risk_alert --history .\data\yahoo_snapshots.csv --current-late
 
 대시보드에는 최신 ETF별 옵션 현황, 풋 프리미엄 추이, 풋/콜 프리미엄 비율, IV30 추이, 풋옵션 만기/행사가 구간 상세가 포함됩니다. 생성된 HTML은 별도 서버 없이 브라우저에서 바로 열 수 있습니다.
 
-## Vercel 배포 (보호된 정적 대시보드)
+## Vercel 배포 (공개 정적 대시보드)
 
 이 저장소는 정적 대시보드(`public/index.html`)를 Vercel에 배포하도록 구성되어 있습니다.
 
 - **데이터 수집은 Vercel 밖**에서 합니다. Yahoo가 데이터센터 IP를 차단하고 yfinance가 무거워 Vercel 서버리스에는 부적합하기 때문입니다.
 - **GitHub Actions**(`.github/workflows/dashboard.yml`)가 미국 정규장 시간에 주기적으로 스냅샷을 수집·누적하고 `public/index.html`을 재생성한 뒤 커밋합니다. Vercel은 push마다 자동 재배포합니다.
-- **접근 보호**: 루트 `middleware.js`가 HTTP Basic Auth를 강제합니다. 자격증명은 Vercel 환경변수에서만 읽으며, 미설정 시 모든 요청을 401로 막습니다(fail-closed).
+- **접근**: 현재 대시보드는 **공개**입니다(URL을 아는 누구나 접근). 배포 경로에는 옵션 파생 메트릭만 포함되며 토큰·PII는 없습니다.
 
 ### 구성 요소
 
@@ -189,22 +189,17 @@ python -m options_risk_alert --history .\data\yahoo_snapshots.csv --current-late
 | --- | --- |
 | `public/index.html` | 배포되는 정적 대시보드 (자동 생성·커밋) |
 | `vercel.json` | `public/`을 사이트 루트로 서빙, 보안 헤더, 빌드 없음 |
-| `middleware.js` | Basic Auth (env 자격증명, fail-closed) |
 | `.vercelignore` | Python 수집기·데이터·테스트를 배포에서 제외 |
 | `.github/workflows/dashboard.yml` | 정기 수집 → 재생성 → 커밋 |
 
 ### 최초 배포 절차 (1회)
 
-1. 이 저장소를 **private** GitHub 저장소로 push 합니다.
-2. Vercel에서 New Project → 해당 저장소 Import (Framework Preset: Other).
-3. Vercel 프로젝트 환경변수에 자격증명을 추가합니다(저장소에 절대 커밋하지 않음).
-
-   ```
-   BASIC_AUTH_USER=<원하는 아이디>
-   BASIC_AUTH_PASSWORD=<강력한 비밀번호>
-   ```
-
-4. 배포 후 대시보드 URL 접속 시 Basic Auth 창이 뜨면 정상입니다.
-5. GitHub Actions는 기본 `GITHUB_TOKEN`만으로 데이터를 커밋합니다. 저장소 Settings → Actions → Workflow permissions를 **Read and write**로 설정하세요.
+1. 이 저장소를 GitHub에 push 합니다.
+2. Vercel에서 New Project → 해당 저장소 Import (Framework Preset: Other) → Deploy.
+3. GitHub Actions는 기본 `GITHUB_TOKEN`만으로 데이터를 커밋합니다. 저장소 Settings → Actions → Workflow permissions를 **Read and write**로 설정하세요.
 
 > Telegram 토큰 등 운영 비밀은 Vercel/GitHub에 올리지 않습니다. 대시보드 배포 경로에는 옵션 메트릭(파생 데이터)만 포함됩니다.
+
+### 나중에 접근 보호를 켜려면
+
+가장 간단한 방법은 Vercel의 **Settings → Deployment Protection → Password Protection**(플랜에 따라 유료)을 켜는 것입니다. 코드 변경이 필요 없습니다.
